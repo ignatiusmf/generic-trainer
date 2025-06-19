@@ -13,7 +13,6 @@ import argparse
 DEVICE = "cuda"
 EPOCHS = 150
 BATCH_SIZE = 128
-BETA = 750
 
 parser = argparse.ArgumentParser(description='Run a training script with custom parameters.')
 parser.add_argument('--experiment_name', type=str, default='no_name')
@@ -24,10 +23,11 @@ EXPERIMENT_PATH = args.experiment_name
 Path(f"experiments/{EXPERIMENT_PATH}").mkdir(parents=True, exist_ok=True)
 print(vars(args))
 
-model = ResNet112(100).to(DEVICE)
 
-Data = TinyImageNet(BATCH_SIZE)
+Data = Cifar100(BATCH_SIZE)
 trainloader, testloader = Data.trainloader, Data.testloader
+
+model = ResNet112(Data.class_num).to(DEVICE)
 
 optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
 scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=EPOCHS)

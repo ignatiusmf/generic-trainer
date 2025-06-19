@@ -49,21 +49,17 @@ def check_path_and_skip(experiment_name):
     return False
 
 def generate_python_cmd(experiment_name, noise_std, noise_target):
-    output = f"python trian.py --noise_std {noise_std:.2f} --noise_target {noise_target} --experiment_name {experiment_name}"
+    output = f"python trian.py --experiment_name {experiment_name}"
     print(output)
     return output
 
 runs = 10
-noise_stds = np.arange(0, 4, 0.333)
-targets = ['student', 'teacher', 'both']
 
 for run in range(runs):
-    for noise_target in targets:
-        for noise_std in noise_stds:
-            experiment_name = f'{noise_target}/std{noise_std:.2f}/{run}'
-            if check_path_and_skip(experiment_name): continue
-            python_cmd = generate_python_cmd(experiment_name, noise_std, noise_target)
-            generate_pbs_script(python_cmd, experiment_name)
+    experiment_name = f'TinyImageNet/{run}'
+    if check_path_and_skip(experiment_name): continue
+    python_cmd = generate_python_cmd(experiment_name)
+    generate_pbs_script(python_cmd, experiment_name)
 
 
 print('All experiments are finished / queued')
