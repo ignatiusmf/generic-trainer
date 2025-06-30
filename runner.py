@@ -43,17 +43,17 @@ def check_path_and_skip(experiment_name):
 
     if experiment_path.exists():
         return True
-
+        
     experiment_path.mkdir(parents=True)
     total += 1
     return False
 
-def generate_python_cmd(experiment_name, noise_std, noise_target):
+def generate_python_cmd(experiment_name):
     output = f"python trian.py --experiment_name {experiment_name}"
     print(output)
     return output
 
-runs = 10
+runs = 2 
 
 for run in range(runs):
     experiment_name = f'TinyImageNet/{run}'

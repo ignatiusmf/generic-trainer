@@ -24,7 +24,7 @@ Path(f"experiments/{EXPERIMENT_PATH}").mkdir(parents=True, exist_ok=True)
 print(vars(args))
 
 
-Data = Cifar100(BATCH_SIZE)
+Data = TinyImageNet(BATCH_SIZE)
 trainloader, testloader = Data.trainloader, Data.testloader
 
 model = ResNet112(Data.class_num).to(DEVICE)
@@ -66,7 +66,7 @@ for i in range(EPOCHS):
 
     if tea > max_acc:
         max_acc = tea
-        torch.save({'weights': model.state_dict()}, f'experiments/{EXPERIMENT_PATH}/ResNet112.pth')
+        torch.save({'weights': model.state_dict()}, f'experiments/{EXPERIMENT_PATH}/TinyImageNet_ResNet112.pth')
     
     plot_the_things(train_loss, test_loss, train_acc, test_acc, EXPERIMENT_PATH)
 
