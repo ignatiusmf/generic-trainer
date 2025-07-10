@@ -1,4 +1,4 @@
-from toolbox.models import ResNet112
+from toolbox.models import ResNet112, ResNet56, ResNet20, ResNetBaby
 from toolbox.data_loader import Cifar100, TinyImageNet
 from toolbox.utils import plot_the_things, evaluate_model
 
@@ -6,6 +6,8 @@ import torch
 import torch.optim as optim
 import torch.nn.functional as F
 
+import numpy as np
+import random
 
 from pathlib import Path
 import argparse
@@ -14,20 +16,43 @@ DEVICE = "cuda"
 EPOCHS = 150
 BATCH_SIZE = 128
 
+MODELS = {
+    'ResNet112': ResNet112,
+    'ResNet56': ResNet56,
+    'ResNet20': ResNet20,
+    'ResNetBaby': ResNetBaby,
+}
+
+DATASETS = {
+    'TinyImageNet': TinyImageNet,
+    'Cifar100': Cifar100
+}
+
 parser = argparse.ArgumentParser(description='Run a training script with custom parameters.')
-parser.add_argument('--experiment_name', type=str, default='no_name')
+parser.add_argument('--experiment_name', type=str, default='default')
+parser.add_argument('--model', type=str, default='ResNet112', choices=MODELS.keys())
+parser.add_argument('--dataset', type=str, default='TinyImageNet', choices=DATASETS.keys())
 args = parser.parse_args()
 
 EXPERIMENT_PATH = args.experiment_name
+MODEL = args.model
+DATASET = args.dataset
+seed = int(EXPERIMENT_PATH.split('/')[-1]) if EXPERIMENT_PATH.split('/')[-1].isdigit() else 0
 
 Path(f"experiments/{EXPERIMENT_PATH}").mkdir(parents=True, exist_ok=True)
-print(vars(args))
 
+print(vars(args), f'{seed=}')
+torch.manual_seed(seed)
+torch.cuda.manual_seed(seed)
+np.random.seed(seed)
+random.seed(seed)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
 
-Data = TinyImageNet(BATCH_SIZE)
+Data = DATASETS[DATASET](BATCH_SIZE, seed=seed)
 trainloader, testloader = Data.trainloader, Data.testloader
 
-model = ResNet112(Data.class_num).to(DEVICE)
+model = MODELS[MODEL](Data.class_num).to(DEVICE)
 
 optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
 scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=EPOCHS)
@@ -66,7 +91,8 @@ for i in range(EPOCHS):
 
     if tea > max_acc:
         max_acc = tea
-        torch.save({'weights': model.state_dict()}, f'experiments/{EXPERIMENT_PATH}/TinyImageNet_ResNet112.pth')
+        checkpoint_name = '_'.join(EXPERIMENT_PATH.split('/')[:-1])
+        torch.save({'weights': model.state_dict()}, f'experiments/{EXPERIMENT_PATH}/{checkpoint_name}.pth')
     
     plot_the_things(train_loss, test_loss, train_acc, test_acc, EXPERIMENT_PATH)
 

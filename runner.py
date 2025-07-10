@@ -43,23 +43,24 @@ def check_path_and_skip(experiment_name):
 
     if experiment_path.exists():
         return True
-        
+
     experiment_path.mkdir(parents=True)
     total += 1
     return False
 
-def generate_python_cmd(experiment_name):
-    output = f"python trian.py --experiment_name {experiment_name}"
+def generate_python_cmd(experiment_name, model):
+    output = f"python train.py --experiment_name {experiment_name} --model {model}"
     print(output)
     return output
 
-runs = 2 
-
+runs = 3
+models = ['ResNet112', 'ResNet56']
 for run in range(runs):
-    experiment_name = f'TinyImageNet/{run}'
-    if check_path_and_skip(experiment_name): continue
-    python_cmd = generate_python_cmd(experiment_name)
-    generate_pbs_script(python_cmd, experiment_name)
+    for model in models:
+        experiment_name = f'TinyImageNet/{model}/{run}'
+        if check_path_and_skip(experiment_name): continue
+        python_cmd = generate_python_cmd(experiment_name, model)
+        generate_pbs_script(python_cmd, experiment_name)
 
 
 print('All experiments are finished / queued')
