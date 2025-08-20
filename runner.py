@@ -48,18 +48,19 @@ def check_path_and_skip(experiment_name):
     total += 1
     return False
 
-def generate_python_cmd(experiment_name, model):
-    output = f"python train.py --experiment_name {experiment_name} --model {model}"
+def generate_python_cmd(experiment_name, model, dataset):
+    output = f"python train.py --experiment_name {experiment_name} --model {model} --dataset {dataset}"
     print(output)
     return output
 
 runs = 3
-models = ['ResNet112', 'ResNet56']
+models = ['ResNet56']
+dataset = 'Cifar10'
 for run in range(runs):
     for model in models:
-        experiment_name = f'TinyImageNet/{model}/{run}'
+        experiment_name = f'{dataset}/{model}/{run}'
         if check_path_and_skip(experiment_name): continue
-        python_cmd = generate_python_cmd(experiment_name, model)
+        python_cmd = generate_python_cmd(experiment_name, model, dataset)
         generate_pbs_script(python_cmd, experiment_name)
 
 

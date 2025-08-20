@@ -1,5 +1,5 @@
 from toolbox.models import ResNet112, ResNet56, ResNet20, ResNetBaby
-from toolbox.data_loader import Cifar100, TinyImageNet
+from toolbox.data_loader import Cifar10, Cifar100, TinyImageNet
 from toolbox.utils import plot_the_things, evaluate_model
 
 import torch
@@ -25,7 +25,8 @@ MODELS = {
 
 DATASETS = {
     'TinyImageNet': TinyImageNet,
-    'Cifar100': Cifar100
+    'Cifar100': Cifar100,
+    'Cifar10': Cifar10
 }
 
 parser = argparse.ArgumentParser(description='Run a training script with custom parameters.')
